@@ -44,9 +44,12 @@ export class UserService {
   }
 
   async login(loginUserDto: LoginUserDto): Promise<UserEntity> {
-    const userByEmail = await this.userRepository.findOne({
-      email: loginUserDto.email,
-    });
+    const userByEmail = await this.userRepository.findOne(
+      {
+        email: loginUserDto.email,
+      },
+      { select: ['id', 'username', 'email', 'bio', 'image', 'password'] },
+    );
 
     if (!userByEmail) {
       throw new HttpException(
@@ -64,6 +67,8 @@ export class UserService {
       throw new HttpException('Incorrect password', HttpStatus.UNAUTHORIZED);
     }
 
+    delete userByEmail.password;
+
     return userByEmail;
   }
 
@@ -79,11 +84,9 @@ export class UserService {
   }
 
   buildUserResponse(user: UserEntity): UserResponseInterface {
-    const { password: _, ...userData } = user;
-
     return {
       user: {
-        ...userData,
+        ...user,
         token: this.generateJwt(user),
       },
     };
