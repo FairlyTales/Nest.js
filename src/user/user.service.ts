@@ -82,9 +82,20 @@ export class UserService {
     updateUserDto: UpdateUserDto,
   ): Promise<UserEntity> {
     const user = await this.getUserById(userId);
-    Object.assign(user, updateUserDto);
 
-    return await this.userRepository.save(user);
+    const updateResult = await this.userRepository
+      .createQueryBuilder()
+      .update({
+        ...user,
+        ...updateUserDto,
+      })
+      .where({
+        id: user.id,
+      })
+      .returning('*')
+      .execute();
+
+    return updateResult.raw[0];
   }
 
   generateJwt(user: UserEntity): string {
