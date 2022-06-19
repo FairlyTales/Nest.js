@@ -5,6 +5,8 @@ import { ArticleEntity } from '@app/article/article.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ArticleResponseInterface } from '@app/article/types/articleResponse.interface';
+import slugify from 'slugify';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class ArticleService {
@@ -24,8 +26,7 @@ export class ArticleService {
       article.tagList = [];
     }
 
-    //TODO: add slug generation and remove this temporary placeholder
-    article.slug = 'temp';
+    article.slug = ArticleService.getSlug(createArticleDto.title);
 
     // ArticleEntity doesn't have an author property, it's a relation with UserEntity in typeorm
     article.author = user;
@@ -35,5 +36,9 @@ export class ArticleService {
 
   buildArticleResponse(article: ArticleEntity): ArticleResponseInterface {
     return { article };
+  }
+
+  private static getSlug(title: string): string {
+    return slugify(title, { lower: true }) + '-' + uuidv4();
   }
 }
