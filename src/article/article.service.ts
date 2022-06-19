@@ -4,6 +4,7 @@ import { CreateArticleDto } from '@app/article/dto/createArticle.dto';
 import { ArticleEntity } from '@app/article/article.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ArticleResponseInterface } from '@app/article/types/articleResponse.interface';
 
 @Injectable()
 export class ArticleService {
@@ -30,5 +31,9 @@ export class ArticleService {
     article.author = user;
 
     return await this.articleRepository.save(article);
+  }
+
+  buildArticleResponse(article: ArticleEntity): ArticleResponseInterface {
+    return { article };
   }
 }
