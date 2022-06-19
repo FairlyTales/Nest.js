@@ -38,7 +38,9 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.3",
+    "slugify": "^1.6.5",
     "typeorm": "^0.2.32",
+    "uuid": "^8.3.2",
     "webpack": "^5.73.0"
   },
   "devDependencies": {
