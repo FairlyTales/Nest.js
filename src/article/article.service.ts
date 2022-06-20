@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserEntity } from '@app/user/user.entity';
-import { CreateArticleDto } from '@app/article/dto/createArticle.dto';
+import { PersistArticleDto } from '@app/article/dto/persistArticleDto';
 import { ArticleEntity } from '@app/article/article.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -17,7 +17,7 @@ export class ArticleService {
 
   async createArticle(
     user: UserEntity,
-    createArticleDto: CreateArticleDto,
+    createArticleDto: PersistArticleDto,
   ): Promise<ArticleEntity> {
     const article = new ArticleEntity();
     Object.assign(article, createArticleDto);
@@ -38,13 +38,39 @@ export class ArticleService {
     return await this.findBySlug(slug);
   }
 
-  async deleteArticle(
-    currentUserId: number,
+  async updateArticle(
+    userId: number,
     slug: string,
+    updateArticleDto: PersistArticleDto,
   ): Promise<ArticleEntity> {
     const article = await this.findBySlug(slug);
 
-    if (article.author.id !== currentUserId) {
+    if (article.author.id !== userId) {
+      throw new HttpException(
+        "Can't update article because it wasn't created by you",
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const updateResult = await this.articleRepository
+      .createQueryBuilder()
+      .update({
+        ...article,
+        ...updateArticleDto,
+      })
+      .where('slug = :slug', { slug: article.slug })
+      .returning('*')
+      .execute();
+
+    console.log(updateResult.raw[0]);
+
+    return updateResult.raw[0];
+  }
+
+  async deleteArticle(userId: number, slug: string): Promise<ArticleEntity> {
+    const article = await this.findBySlug(slug);
+
+    if (article.author.id !== userId) {
       throw new HttpException(
         "Can't delete article because it wasn't created by you",
         HttpStatus.UNAUTHORIZED,
