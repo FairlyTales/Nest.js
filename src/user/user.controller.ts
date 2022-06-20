@@ -2,8 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  Patch,
   Post,
-  Put,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -47,7 +47,7 @@ export class UserController {
     return this.userService.buildUserResponse(user);
   }
 
-  @Put('user')
+  @Patch('user')
   @UseGuards(AuthGuard)
   async updateUser(
     @User('id') currentUserId: number,
