@@ -35,6 +35,41 @@ export class ArticleService {
   }
 
   async getArticle(slug: string): Promise<ArticleEntity> {
+    return await this.findBySlug(slug);
+  }
+
+  async deleteArticle(
+    currentUserId: number,
+    slug: string,
+  ): Promise<ArticleEntity> {
+    const article = await this.findBySlug(slug);
+
+    if (article.author.id !== currentUserId) {
+      throw new HttpException(
+        "Can't delete article because it wasn't created by you",
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const deleteResult = await this.articleRepository
+      .createQueryBuilder()
+      .delete()
+      .from(ArticleEntity)
+      .where('slug = :slug', { slug: article.slug })
+      .returning('*')
+      .execute();
+
+    return deleteResult.raw[0];
+  }
+
+  buildArticleResponse(
+    article: ArticleEntity,
+    message?: string,
+  ): ArticleResponseInterface {
+    return { message, article };
+  }
+
+  private async findBySlug(slug: string): Promise<ArticleEntity> {
     const article = await this.articleRepository.findOne({ slug });
 
     if (!article) {
@@ -42,10 +77,6 @@ export class ArticleService {
     }
 
     return article;
-  }
-
-  buildArticleResponse(article: ArticleEntity): ArticleResponseInterface {
-    return { article };
   }
 
   private static getSlug(title: string): string {
