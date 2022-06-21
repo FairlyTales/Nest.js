@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -16,10 +17,20 @@ import { User } from '@app/user/decorators/user.decorator';
 import { UserEntity } from '@app/user/user.entity';
 import { PersistArticleDto } from '@app/article/dto/persistArticleDto';
 import { ArticleResponseInterface } from '@app/article/types/articleResponse.interface';
+import { ArticlesResponseInterface } from '@app/article/types/articlesResponse.interface';
+import { ArticlesQueryInterface } from '@app/article/types/articlesQuery.interface';
 
 @Controller('articles')
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
+
+  @Get()
+  async getAllArticles(
+    @User('id') userId: number,
+    @Query() query: ArticlesQueryInterface,
+  ): Promise<ArticlesResponseInterface> {
+    return await this.articleService.getAllArticles(userId, query);
+  }
 
   @Post()
   @UseGuards(AuthGuard)
