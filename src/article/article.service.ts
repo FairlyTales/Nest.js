@@ -104,8 +104,6 @@ export class ArticleService {
       .returning('*')
       .execute();
 
-    console.log(updateResult.raw[0]);
-
     return updateResult.raw[0];
   }
 
