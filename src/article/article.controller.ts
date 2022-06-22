@@ -78,7 +78,7 @@ export class ArticleController {
   async deleteArticle(
     @User('id') userId: number,
     @Param('slug') slug: string,
-  ): Promise<any> {
+  ): Promise<ArticleResponseInterface> {
     const deletedArticle = await this.articleService.deleteArticle(
       userId,
       slug,
