@@ -89,4 +89,21 @@ export class ArticleController {
       'Article successfully deleted',
     );
   }
+
+  @Post(':slug/favourites')
+  @UseGuards(AuthGuard)
+  async favouriteArticle(
+    @User('id') userId: number,
+    @Param('slug') slug: string,
+  ): Promise<ArticleResponseInterface> {
+    const article = await this.articleService.addArticleToFavorites(
+      userId,
+      slug,
+    );
+
+    return this.articleService.buildArticleResponse(
+      article,
+      'Article successfully favourited',
+    );
+  }
 }

@@ -128,6 +128,43 @@ export class ArticleService {
     return deleteResult.raw[0];
   }
 
+  async addArticleToFavorites(
+    userId: number,
+    slug: string,
+  ): Promise<ArticleEntity> {
+    const article = await this.findBySlug(slug);
+
+    if (!article) {
+      throw new HttpException('Article not found', HttpStatus.NOT_FOUND);
+    }
+
+    const user = await this.userRepository.findOne(userId, {
+      relations: ['favourites'],
+    });
+
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    const isAlreadyFavourited =
+      user.favourites.findIndex((fav) => fav.slug === article.slug) !== -1;
+
+    if (isAlreadyFavourited) {
+      throw new HttpException(
+        'This article is already favourited',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    user.favourites.push(article);
+    article.favouritesCount++;
+
+    await this.userRepository.save(user);
+    await this.articleRepository.save(article);
+
+    return article;
+  }
+
   buildArticleResponse(
     article: ArticleEntity,
     message?: string,
