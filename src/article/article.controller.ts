@@ -106,4 +106,21 @@ export class ArticleController {
       'Article successfully favourited',
     );
   }
+
+  @Delete(':slug/favourites')
+  @UseGuards(AuthGuard)
+  async deleteArticleFromFavourite(
+    @User('id') userId: number,
+    @Param('slug') slug: string,
+  ): Promise<ArticleResponseInterface> {
+    const article = await this.articleService.deleteArticleFromFavourite(
+      userId,
+      slug,
+    );
+
+    return this.articleService.buildArticleResponse(
+      article,
+      'Article successfully unfavourited',
+    );
+  }
 }

@@ -165,6 +165,45 @@ export class ArticleService {
     return article;
   }
 
+  async deleteArticleFromFavourite(
+    userId: number,
+    slug: string,
+  ): Promise<ArticleEntity> {
+    const article = await this.findBySlug(slug);
+
+    if (!article) {
+      throw new HttpException('Article not found', HttpStatus.NOT_FOUND);
+    }
+
+    const user = await this.userRepository.findOne(userId, {
+      relations: ['favourites'],
+    });
+
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    // 1 if not found, otherwise returns the index of the element
+    const articleIndex = user.favourites.findIndex(
+      (fav) => fav.slug === article.slug,
+    );
+
+    if (articleIndex === -1) {
+      throw new HttpException(
+        'This article was not favourited',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    user.favourites.splice(articleIndex, 1);
+    article.favouritesCount--;
+
+    await this.userRepository.save(user);
+    await this.articleRepository.save(article);
+
+    return article;
+  }
+
   buildArticleResponse(
     article: ArticleEntity,
     message?: string,
