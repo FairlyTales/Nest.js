@@ -69,11 +69,27 @@ export class ArticleService {
 
     if (query.offset) queryBuilder.offset(query.offset);
 
-    const articles = await queryBuilder.getMany();
+    let favouritedByUserArticlesId: number[] = [];
+
+    // if user is logged in
+    if (userId) {
+      const user = await this.userRepository.findOne(
+        { id: userId },
+        { relations: ['favourites'] },
+      );
+
+      favouritedByUserArticlesId = user.favourites.map((article) => article.id);
+    }
+
+    const allArticles = await queryBuilder.getMany();
+    const articleWithFavourites = allArticles.map((article) => {
+      const favourited = favouritedByUserArticlesId.includes(article.id);
+      return { ...article, favourited };
+    });
 
     return {
       articlesCount,
-      articles,
+      articles: articleWithFavourites,
     };
   }
 
