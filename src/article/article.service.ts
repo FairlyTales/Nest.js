@@ -45,6 +45,26 @@ export class ArticleService {
       });
     }
 
+    if (query.favouritedBy) {
+      const author = await this.userRepository.findOne(
+        {
+          username: query.favouritedBy,
+        },
+        { relations: ['favourites'] },
+      );
+      console.log(author.favourites);
+      const ids = author.favourites.map((article) => article.id);
+
+      if (ids.length > 0) {
+        queryBuilder.andWhere('articles.id IN (:...ids)', {
+          ids: ids,
+        });
+      } else {
+        // using 1=0 to make the query return empty array
+        queryBuilder.andWhere('1=0');
+      }
+    }
+
     if (query.limit) queryBuilder.limit(query.limit);
 
     if (query.offset) queryBuilder.offset(query.offset);
