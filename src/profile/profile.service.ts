@@ -13,7 +13,8 @@ export class ProfileService {
     private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(FollowEntity)
     private readonly followRepository: Repository<FollowEntity>,
-  ) {}
+  ) {
+  }
 
   async getProfile(
     username: string,
@@ -30,7 +31,12 @@ export class ProfileService {
       );
     }
 
-    return { ...profile, following: false };
+    const follow = await this.followRepository.findOne({
+      followerId: currentUserId,
+      followingId: profile.id,
+    });
+
+    return { ...profile, following: Boolean(follow) };
   }
 
   async followProfile(username: string, userId: number): Promise<ProfileType> {
