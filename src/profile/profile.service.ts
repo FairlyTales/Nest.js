@@ -13,8 +13,7 @@ export class ProfileService {
     private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(FollowEntity)
     private readonly followRepository: Repository<FollowEntity>,
-  ) {
-  }
+  ) {}
 
   async getProfile(
     username: string,

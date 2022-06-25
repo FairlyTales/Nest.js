@@ -9,6 +9,7 @@ import slugify from 'slugify';
 import { v4 as uuidv4 } from 'uuid';
 import { ArticlesResponseInterface } from '@app/article/types/articlesResponse.interface';
 import { ArticlesQueryInterface } from '@app/article/types/articlesQuery.interface';
+import { FollowEntity } from '@app/profile/follow.entity';
 
 @Injectable()
 export class ArticleService {
@@ -17,6 +18,8 @@ export class ArticleService {
     private readonly articleRepository: Repository<ArticleEntity>,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(FollowEntity)
+    private readonly followRepository: Repository<FollowEntity>,
   ) {}
 
   async getAllArticles(
@@ -91,6 +94,35 @@ export class ArticleService {
       articlesCount,
       articles: articleWithFavourites,
     };
+  }
+
+  // get all articles created by users followed by current user
+  async getFeed(
+    userId: number,
+    query: ArticlesQueryInterface,
+  ): Promise<ArticlesResponseInterface> {
+    const followedUsers = await this.followRepository.find({
+      followerId: userId,
+    });
+
+    if (followedUsers.length === 0) return { articles: [], articlesCount: 0 };
+
+    const followedUserIds = followedUsers.map((user) => user.followingId);
+
+    const queryBuilder = getRepository(ArticleEntity)
+      .createQueryBuilder('articles')
+      .leftJoinAndSelect('articles.author', 'author')
+      .where('articles.authorId IN (:...ids)', { ids: followedUserIds });
+
+    queryBuilder.orderBy('articles.createdAt', 'DESC');
+    const articlesCount = await queryBuilder.getCount();
+
+    if (query.limit) queryBuilder.limit(query.limit);
+    if (query.offset) queryBuilder.offset(query.offset);
+
+    const articles = await queryBuilder.getMany();
+
+    return { articles, articlesCount };
   }
 
   async createArticle(
