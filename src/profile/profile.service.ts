@@ -34,16 +34,7 @@ export class ProfileService {
   }
 
   async followProfile(username: string, userId: number): Promise<ProfileType> {
-    const profile = await this.userRepository.findOne({
-      username,
-    });
-
-    if (!profile) {
-      throw new HttpException(
-        'Profile with this username not found',
-        HttpStatus.NOT_FOUND,
-      );
-    }
+    const profile = await this.getProfile(username, userId);
 
     if (userId === profile.id) {
       throw new HttpException(
@@ -72,6 +63,39 @@ export class ProfileService {
     await this.followRepository.save(newFollow);
 
     return { ...profile, following: true };
+  }
+
+  async unfollowProfile(
+    username: string,
+    userId: number,
+  ): Promise<ProfileType> {
+    const profile = await this.getProfile(username, userId);
+
+    if (userId === profile.id) {
+      throw new HttpException(
+        'You can not unfollow yourself',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const follow = await this.followRepository.findOne({
+      followerId: userId,
+      followingId: profile.id,
+    });
+
+    if (!follow) {
+      throw new HttpException(
+        "You already don't follow this profile",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    await this.followRepository.delete({
+      followerId: userId,
+      followingId: profile.id,
+    });
+
+    return { ...profile, following: false };
   }
 
   buildProfileResponse(profile: ProfileType): ProfileResponseInterface {
