@@ -171,11 +171,7 @@ export class ArticleService {
     slug: string,
     id: string,
   ): Promise<CommentEntity> {
-    const article = await this.getArticle(slug);
-
-    if (!article) {
-      throw new HttpException('Article not found', HttpStatus.NOT_FOUND);
-    }
+    const article = await this.findBySlug(slug);
 
     const commentId = Number(id);
     const comment = await this.commentRepository.findOne({
@@ -296,10 +292,6 @@ export class ArticleService {
     slug: string,
   ): Promise<ArticleEntity> {
     const article = await this.findBySlug(slug);
-
-    if (!article) {
-      throw new HttpException('Article not found', HttpStatus.NOT_FOUND);
-    }
 
     const user = await this.userRepository.findOne(userId, {
       relations: ['favourites'],
