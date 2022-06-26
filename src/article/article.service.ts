@@ -176,7 +176,7 @@ export class ArticleService {
     if (article.author.id !== userId) {
       throw new HttpException(
         "Can't update article because it wasn't created by you",
-        HttpStatus.UNAUTHORIZED,
+        HttpStatus.FORBIDDEN,
       );
     }
 
@@ -199,7 +199,7 @@ export class ArticleService {
     if (article.author.id !== userId) {
       throw new HttpException(
         "Can't delete article because it wasn't created by you",
-        HttpStatus.UNAUTHORIZED,
+        HttpStatus.FORBIDDEN,
       );
     }
 
