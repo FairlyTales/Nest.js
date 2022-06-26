@@ -338,7 +338,7 @@ export class ArticleService {
   }
 
   buildCommentResponse(comment: CommentEntity): CommentResponseInterface {
-    return { comment };
+    return { message: 'Comment deleted successfully', comment };
   }
 
   private async findBySlug(slug: string): Promise<ArticleEntity> {
