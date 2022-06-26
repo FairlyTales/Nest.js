@@ -15,4 +15,10 @@ export class CommentEntity {
 
   @Column()
   body: string;
+
+  @ManyToOne(() => UserEntity, (user) => user.comments, { eager: true })
+  author: UserEntity;
+
+  @ManyToOne(() => ArticleEntity, (article) => article.comments)
+  article: ArticleEntity;
 }
