@@ -140,9 +140,10 @@ export class ArticleController {
   @UseGuards(AuthGuard)
   async addComment(
     @User('id') userId: number,
+    @Param('slug') slug: string,
     @Body('comment') commentDto: CommentDto,
   ): Promise<CommentResponseInterface> {
-    const comment = await this.articleService.addComment(userId, commentDto);
+    const comment = await this.articleService.addComment(userId, slug, commentDto);
 
     return this.articleService.buildCommentResponse(comment);
   }

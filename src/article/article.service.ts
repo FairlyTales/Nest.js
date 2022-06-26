@@ -155,13 +155,17 @@ export class ArticleService {
 
   async addComment(
     userId: number,
+    slug: string,
     commentDto: CommentDto,
   ): Promise<CommentEntity> {
+    const article = await this.findBySlug(slug);
+
     const comment = new CommentEntity();
     Object.assign(comment, commentDto);
 
     const author = await this.userRepository.findOne(userId);
     comment.author = author;
+    comment.article = article;
 
     return await this.commentRepository.save(comment);
   }
