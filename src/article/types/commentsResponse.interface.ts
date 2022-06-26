@@ -1,5 +1,6 @@
-import { CommentResponseInterface } from '@app/article/types/commentResponse.interface';
+import { CommentEntity } from '@app/article/comment.entity';
 
 export interface CommentsResponseInterface {
-  comments: CommentResponseInterface[];
+  comments: CommentEntity[];
+  commentsCount: number;
 }
