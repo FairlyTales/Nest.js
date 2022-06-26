@@ -19,6 +19,8 @@ import { PersistArticleDto } from '@app/article/dto/persistArticleDto';
 import { ArticleResponseInterface } from '@app/article/types/articleResponse.interface';
 import { ArticlesResponseInterface } from '@app/article/types/articlesResponse.interface';
 import { ArticlesQueryInterface } from '@app/article/types/articlesQuery.interface';
+import { CommentDto } from '@app/article/dto/commentDto';
+import { CommentResponseInterface } from '@app/article/types/commentResponse.interface';
 
 @Controller('articles')
 export class ArticleController {
@@ -132,5 +134,16 @@ export class ArticleController {
       article,
       'Article successfully unfavourited',
     );
+  }
+
+  @Post(':slug/comments')
+  @UseGuards(AuthGuard)
+  async addComment(
+    @User('id') userId: number,
+    @Body('comment') commentDto: CommentDto,
+  ): Promise<CommentResponseInterface> {
+    const comment = await this.articleService.addComment(userId, commentDto);
+
+    return this.articleService.buildCommentResponse(comment);
   }
 }

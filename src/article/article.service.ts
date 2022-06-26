@@ -10,6 +10,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { ArticlesResponseInterface } from '@app/article/types/articlesResponse.interface';
 import { ArticlesQueryInterface } from '@app/article/types/articlesQuery.interface';
 import { FollowEntity } from '@app/profile/follow.entity';
+import { CommentResponseInterface } from '@app/article/types/commentResponse.interface';
+import { CommentDto } from '@app/article/dto/commentDto';
+import { CommentEntity } from '@app/article/comment.entity';
 
 @Injectable()
 export class ArticleService {
@@ -20,7 +23,13 @@ export class ArticleService {
     private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(FollowEntity)
     private readonly followRepository: Repository<FollowEntity>,
+    @InjectRepository(CommentEntity)
+    private readonly commentRepository: Repository<CommentEntity>,
   ) {}
+
+  async getArticle(slug: string): Promise<ArticleEntity> {
+    return await this.findBySlug(slug);
+  }
 
   async getAllArticles(
     userId: number,
@@ -144,8 +153,17 @@ export class ArticleService {
     return await this.articleRepository.save(article);
   }
 
-  async getArticle(slug: string): Promise<ArticleEntity> {
-    return await this.findBySlug(slug);
+  async addComment(
+    userId: number,
+    commentDto: CommentDto,
+  ): Promise<CommentEntity> {
+    const comment = new CommentEntity();
+    Object.assign(comment, commentDto);
+
+    const author = await this.userRepository.findOne(userId);
+    comment.author = author;
+
+    return await this.commentRepository.save(comment);
   }
 
   async updateArticle(
@@ -277,6 +295,10 @@ export class ArticleService {
     message?: string,
   ): ArticleResponseInterface {
     return { message, article };
+  }
+
+  buildCommentResponse(comment: CommentEntity): CommentResponseInterface {
+    return { comment };
   }
 
   private async findBySlug(slug: string): Promise<ArticleEntity> {
