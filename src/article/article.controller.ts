@@ -21,6 +21,7 @@ import { ArticlesResponseInterface } from '@app/article/types/articlesResponse.i
 import { ArticlesQueryInterface } from '@app/article/types/articlesQuery.interface';
 import { CommentDto } from '@app/article/dto/commentDto';
 import { CommentResponseInterface } from '@app/article/types/commentResponse.interface';
+import { CommentsResponseInterface } from '@app/article/types/commentsResponse.interface';
 
 @Controller('articles')
 export class ArticleController {
@@ -143,9 +144,20 @@ export class ArticleController {
     @Param('slug') slug: string,
     @Body('comment') commentDto: CommentDto,
   ): Promise<CommentResponseInterface> {
-    const comment = await this.articleService.addComment(userId, slug, commentDto);
+    const comment = await this.articleService.addComment(
+      userId,
+      slug,
+      commentDto,
+    );
 
     return this.articleService.buildCommentResponse(comment);
+  }
+
+  @Get(':slug/comments')
+  async getArticleComments(
+    @Param('slug') slug: string,
+  ): Promise<CommentsResponseInterface> {
+    return await this.articleService.getArticleComments(slug);
   }
 
   @Delete(':slug/comments/:commentId')

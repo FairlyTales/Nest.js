@@ -13,6 +13,7 @@ import { FollowEntity } from '@app/profile/follow.entity';
 import { CommentResponseInterface } from '@app/article/types/commentResponse.interface';
 import { CommentDto } from '@app/article/dto/commentDto';
 import { CommentEntity } from '@app/article/comment.entity';
+import { CommentsResponseInterface } from '@app/article/types/commentsResponse.interface';
 
 @Injectable()
 export class ArticleService {
@@ -204,6 +205,22 @@ export class ArticleService {
     delete deleteResult.raw[0].articleId;
 
     return deleteResult.raw[0] as CommentEntity;
+  }
+
+  async getArticleComments(slug: string): Promise<CommentsResponseInterface> {
+    const article = await this.articleRepository.findOne({ slug: slug });
+
+    const queryBuilder = getRepository(CommentEntity)
+      .createQueryBuilder('comments')
+      .leftJoinAndSelect('comments.article', 'article')
+      .where('comments.articleId = :articleId', { articleId: article.id });
+
+    queryBuilder.orderBy('comments.createdAt', 'DESC');
+
+    const commentsCount = await queryBuilder.getCount();
+    const comments = await queryBuilder.getMany();
+
+    return { comments, commentsCount };
   }
 
   async updateArticle(
