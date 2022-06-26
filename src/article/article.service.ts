@@ -166,6 +166,46 @@ export class ArticleService {
     return await this.commentRepository.save(comment);
   }
 
+  async deleteComment(
+    userId: number,
+    slug: string,
+    id: string,
+  ): Promise<CommentEntity> {
+    const article = await this.getArticle(slug);
+
+    if (!article) {
+      throw new HttpException('Article not found', HttpStatus.NOT_FOUND);
+    }
+
+    const commentId = Number(id);
+    const comment = await this.commentRepository.findOne({
+      id: commentId,
+    });
+
+    if (!comment) {
+      throw new HttpException('Comment not found', HttpStatus.NOT_FOUND);
+    }
+
+    if (comment.author.id !== userId) {
+      throw new HttpException(
+        'Only author can delete comment',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    const deleteResult = await this.commentRepository
+      .createQueryBuilder()
+      .delete()
+      .from(CommentEntity)
+      .where('id = :slug', { slug: commentId })
+      .returning('*')
+      .execute();
+
+    delete deleteResult.raw[0].articleId;
+
+    return deleteResult.raw[0] as CommentEntity;
+  }
+
   async updateArticle(
     userId: number,
     slug: string,
@@ -211,7 +251,7 @@ export class ArticleService {
       .returning('*')
       .execute();
 
-    return deleteResult.raw[0];
+    return deleteResult.raw[0] as ArticleEntity;
   }
 
   async addArticleToFavorites(

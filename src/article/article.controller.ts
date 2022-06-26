@@ -146,4 +146,20 @@ export class ArticleController {
 
     return this.articleService.buildCommentResponse(comment);
   }
+
+  @Delete(':slug/comments/:commentId')
+  @UseGuards(AuthGuard)
+  async deleteComment(
+    @User('id') userId: number,
+    @Param('slug') slug: string,
+    @Param('commentId') commentId: string,
+  ): Promise<CommentResponseInterface> {
+    const comment = await this.articleService.deleteComment(
+      userId,
+      slug,
+      commentId,
+    );
+
+    return this.articleService.buildCommentResponse(comment);
+  }
 }
