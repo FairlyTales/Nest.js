@@ -19,6 +19,7 @@ import { ProfileModule } from '@app/profile/profile.module';
   ],
   controllers: [AppController],
   providers: [AppService],
+  exports: [AppService],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
