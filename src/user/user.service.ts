@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { forwardRef, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreateUserDto } from '@app/user/dto/createUser.dto';
 import { UserEntity } from '@app/user/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,10 +9,12 @@ import { UserResponseInterface } from '@app/user/types/userResponse.interface';
 import { LoginUserDto } from '@app/user/dto/loginUser.dto';
 import { compare } from 'bcrypt';
 import { UpdateUserDto } from '@app/user/dto/updateUser.dto';
+import { AppService } from '@app/app.service';
 
 @Injectable()
 export class UserService {
   constructor(
+    private readonly appService: AppService,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
   ) {}
@@ -27,13 +29,15 @@ export class UserService {
     });
 
     if (userByEmail)
-      throw new HttpException(
+      this.appService.throwHttpException(
+        'email',
         'User with this email is already registered',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
 
     if (userByUserName)
-      throw new HttpException(
+      this.appService.throwHttpException(
+        'username',
         'User with this name is already registered',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
@@ -53,7 +57,8 @@ export class UserService {
     );
 
     if (!userByEmail) {
-      throw new HttpException(
+      this.appService.throwHttpException(
+        'email',
         'User with this email not found',
         HttpStatus.UNAUTHORIZED,
       );
@@ -65,7 +70,11 @@ export class UserService {
     );
 
     if (!isPasswordValid) {
-      throw new HttpException('Incorrect password', HttpStatus.UNAUTHORIZED);
+      this.appService.throwHttpException(
+        'password',
+        'Incorrect password',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
 
     delete userByEmail.password;

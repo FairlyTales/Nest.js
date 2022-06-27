@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import {
+  forwardRef,
+  MiddlewareConsumer,
+  Module,
+  RequestMethod,
+} from '@nestjs/common';
 import { AppController } from '@app/app.controller';
 import { AppService } from '@app/app.service';
 import { TagModule } from '@app/tag/tag.module';
@@ -13,9 +18,9 @@ import { ProfileModule } from '@app/profile/profile.module';
   imports: [
     TypeOrmModule.forRoot(ormconfig),
     TagModule,
-    UserModule,
     ArticleModule,
     ProfileModule,
+    forwardRef(() => UserModule),
   ],
   controllers: [AppController],
   providers: [AppService],

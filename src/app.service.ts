@@ -1,15 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ErrorResponseInterface } from '@app/types/ErrorResponse.interface';
 
 @Injectable()
 export class AppService {
-  normalizeErrors(errors: any): ErrorResponseInterface {
-    const normalizedErrors = {};
+  throwHttpException(
+    errorTitle: string,
+    errorMessage: string,
+    errorStatus: HttpStatus,
+  ): void {
+    const normalizedErrors: ErrorResponseInterface = {
+      errors: {
+        [errorTitle]: errorMessage,
+      },
+    };
 
-    errors.forEach((err) => {
-      normalizedErrors[err.title] = err.message;
-    });
-
-    return errors;
+    throw new HttpException(normalizedErrors, errorStatus);
   }
 }
