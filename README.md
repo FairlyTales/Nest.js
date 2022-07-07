@@ -2,8 +2,6 @@
 
 Diving into the Nest.js, Typescript, Node.js, Postgresql, TypeORM, Express.js and REST Backend.
 
-This project was created using the nest.js cli
-
 ### Installation
 
 ```bash
