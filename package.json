@@ -3,8 +3,7 @@
   "version": "0.0.1",
   "description": "just_another_medium_clone",
   "author": "khnychkin_kirill",
-  "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
@@ -27,6 +26,7 @@
     "@nestjs/common": "^9.0.1",
     "@nestjs/core": "^9.0.1",
     "@nestjs/platform-express": "^9.0.1",
+    "@nestjs/platform-fastify": "^9.0.1",
     "@nestjs/typeorm": "^9.0.0",
     "bcrypt": "^5.0.1",
     "class-transformer": "^0.5.1",
