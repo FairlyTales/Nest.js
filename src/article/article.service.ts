@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserEntity } from '@app/user/user.entity';
 import { ArticleEntity } from '@app/article/article.entity';
-import { PersistArticleDto } from '@app/article/dto/persistArticleDto';
+import { PersistArticleDto } from '@app/article/dto/persistArticle.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { getRepository, Repository } from 'typeorm';
 import { ArticleResponseInterface } from '@app/article/types/articleResponse.interface';
@@ -11,7 +11,7 @@ import { ArticlesResponseInterface } from '@app/article/types/articlesResponse.i
 import { ArticlesQueryInterface } from '@app/article/types/articlesQuery.interface';
 import { FollowEntity } from '@app/profile/follow.entity';
 import { CommentResponseInterface } from '@app/article/types/commentResponse.interface';
-import { CommentDto } from '@app/article/dto/commentDto';
+import { CommentDto } from '@app/article/dto/comment.dto';
 import { CommentEntity } from '@app/article/comment.entity';
 import { CommentsResponseInterface } from '@app/article/types/commentsResponse.interface';
 
