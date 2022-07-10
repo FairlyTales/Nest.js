@@ -1,4 +1,4 @@
-import { forwardRef, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from '@app/user/dto/createUser.dto';
 import { UserEntity } from '@app/user/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -21,11 +21,15 @@ export class UserService {
 
   async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
     const userByEmail = await this.userRepository.findOne({
-      email: createUserDto.email,
+      where: {
+        email: createUserDto.email,
+      },
     });
 
     const userByUserName = await this.userRepository.findOne({
-      username: createUserDto.username,
+      where: {
+        username: createUserDto.username,
+      },
     });
 
     if (userByEmail)
@@ -49,12 +53,12 @@ export class UserService {
   }
 
   async login(loginUserDto: LoginUserDto): Promise<UserEntity> {
-    const userByEmail = await this.userRepository.findOne(
-      {
+    const userByEmail = await this.userRepository.findOne({
+      where: {
         email: loginUserDto.email,
       },
-      { select: ['id', 'username', 'email', 'bio', 'image', 'password'] },
-    );
+      select: ['id', 'username', 'email', 'bio', 'image', 'password'],
+    });
 
     if (!userByEmail) {
       this.appService.throwHttpException(
@@ -83,7 +87,11 @@ export class UserService {
   }
 
   async getUserById(id: number): Promise<UserEntity> {
-    return await this.userRepository.findOne(id);
+    return await this.userRepository.findOne({
+      where: {
+        id,
+      },
+    });
   }
 
   async updateUser(
