@@ -14,16 +14,18 @@ import { ArticleService } from '@app/article/article.service';
 import { AuthGuard } from '@app/user/guards/auth.guard';
 import { User } from '@app/user/decorators/user.decorator';
 import { UserEntity } from '@app/user/user.entity';
-import { PersistArticleDto } from '@app/article/dto/persistArticleDto';
+import { PersistArticleDto } from '@app/article/dto/persistArticle.dto';
 import { ArticleResponseInterface } from '@app/article/types/articleResponse.interface';
 import { ArticlesResponseInterface } from '@app/article/types/articlesResponse.interface';
 import { ArticlesQueryInterface } from '@app/article/types/articlesQuery.interface';
-import { CommentDto } from '@app/article/dto/commentDto';
+import { CommentDto } from '@app/article/dto/comment.dto';
 import { CommentResponseInterface } from '@app/article/types/commentResponse.interface';
 import { CommentsResponseInterface } from '@app/article/types/commentsResponse.interface';
 import { BackendValidationPipe } from '@app/pipes/BackendValidation.pipe';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 
 @Controller('articles')
+@ApiTags('Articles')
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
@@ -48,6 +50,7 @@ export class ArticleController {
   @Post()
   @UseGuards(AuthGuard)
   @UsePipes(new BackendValidationPipe())
+  @ApiBody({ type: PersistArticleDto })
   async createArticle(
     @User() user: UserEntity,
     @Body('article') createArticleDto: PersistArticleDto,
@@ -72,6 +75,7 @@ export class ArticleController {
   @Put(':slug')
   @UseGuards(AuthGuard)
   @UsePipes(new BackendValidationPipe())
+  @ApiBody({ type: PersistArticleDto })
   async updateArticle(
     @User('id') userId: number,
     @Param('slug') slug: string,
@@ -139,6 +143,7 @@ export class ArticleController {
 
   @Post(':slug/comments')
   @UseGuards(AuthGuard)
+  @ApiBody({ type: CommentDto })
   async addComment(
     @User('id') userId: number,
     @Param('slug') slug: string,

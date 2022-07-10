@@ -16,13 +16,16 @@ import { UserEntity } from '@app/user/user.entity';
 import { AuthGuard } from '@app/user/guards/auth.guard';
 import { UpdateUserDto } from '@app/user/dto/updateUser.dto';
 import { BackendValidationPipe } from '@app/pipes/BackendValidation.pipe';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 
 @Controller()
+@ApiTags('Users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post('users')
+  @Post('user')
   @UsePipes(new BackendValidationPipe())
+  @ApiBody({ type: [CreateUserDto] })
   async createUser(
     @Body('user') createUserDto: CreateUserDto,
   ): Promise<UserResponseInterface> {
@@ -33,6 +36,7 @@ export class UserController {
 
   @Post('users/login')
   @UsePipes(new BackendValidationPipe())
+  @ApiBody({ type: LoginUserDto })
   async login(
     @Body('user') loginUserDto: LoginUserDto,
   ): Promise<UserResponseInterface> {
@@ -49,6 +53,7 @@ export class UserController {
 
   @Patch('user')
   @UseGuards(AuthGuard)
+  @ApiBody({ type: UpdateUserDto })
   async updateUser(
     @User('id') currentUserId: number,
     @Body('user') updateUserDto: UpdateUserDto,
