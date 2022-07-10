@@ -22,7 +22,7 @@ import { CommentDto } from '@app/article/dto/comment.dto';
 import { CommentResponseInterface } from '@app/article/types/commentResponse.interface';
 import { CommentsResponseInterface } from '@app/article/types/commentsResponse.interface';
 import { BackendValidationPipe } from '@app/pipes/BackendValidation.pipe';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @Controller('articles')
 @ApiTags('Articles')
@@ -30,6 +30,7 @@ export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
   @Get()
+  @ApiOperation({ description: 'Get the specified article' })
   async getAllArticles(
     @User('id') userId: number,
     @Query() query: ArticlesQueryInterface,
@@ -40,6 +41,7 @@ export class ArticleController {
   // get all articles created by users followed by current user
   @Get('feed')
   @UseGuards(AuthGuard)
+  @ApiOperation({ description: 'Get the user feed' })
   async getFeed(
     @User('id') userId: number,
     @Query() query: ArticlesQueryInterface,
@@ -51,6 +53,7 @@ export class ArticleController {
   @UseGuards(AuthGuard)
   @UsePipes(new BackendValidationPipe())
   @ApiBody({ type: PersistArticleDto })
+  @ApiOperation({ description: 'Create an article' })
   async createArticle(
     @User() user: UserEntity,
     @Body('article') createArticleDto: PersistArticleDto,
@@ -76,6 +79,7 @@ export class ArticleController {
   @UseGuards(AuthGuard)
   @UsePipes(new BackendValidationPipe())
   @ApiBody({ type: PersistArticleDto })
+  @ApiOperation({ description: 'Update the article' })
   async updateArticle(
     @User('id') userId: number,
     @Param('slug') slug: string,
@@ -92,6 +96,7 @@ export class ArticleController {
 
   @Delete(':slug')
   @UseGuards(AuthGuard)
+  @ApiOperation({ description: 'Delete the article' })
   async deleteArticle(
     @User('id') userId: number,
     @Param('slug') slug: string,
@@ -109,6 +114,7 @@ export class ArticleController {
 
   @Post(':slug/favourites')
   @UseGuards(AuthGuard)
+  @ApiOperation({ description: 'Add article to favourites' })
   async favouriteArticle(
     @User('id') userId: number,
     @Param('slug') slug: string,
@@ -126,6 +132,7 @@ export class ArticleController {
 
   @Delete(':slug/favourites')
   @UseGuards(AuthGuard)
+  @ApiOperation({ description: 'Remove article from favourites' })
   async deleteArticleFromFavourite(
     @User('id') userId: number,
     @Param('slug') slug: string,
@@ -144,6 +151,7 @@ export class ArticleController {
   @Post(':slug/comments')
   @UseGuards(AuthGuard)
   @ApiBody({ type: CommentDto })
+  @ApiOperation({ description: 'Add comment to the article' })
   async addComment(
     @User('id') userId: number,
     @Param('slug') slug: string,
@@ -159,6 +167,7 @@ export class ArticleController {
   }
 
   @Get(':slug/comments')
+  @ApiOperation({ description: 'Get all article comments' })
   async getArticleComments(
     @Param('slug') slug: string,
   ): Promise<CommentsResponseInterface> {
@@ -167,6 +176,7 @@ export class ArticleController {
 
   @Delete(':slug/comments/:commentId')
   @UseGuards(AuthGuard)
+  @ApiOperation({ description: 'Delete article comment' })
   async deleteComment(
     @User('id') userId: number,
     @Param('slug') slug: string,
